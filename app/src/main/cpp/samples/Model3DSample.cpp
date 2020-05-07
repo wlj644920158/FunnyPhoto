@@ -95,13 +95,13 @@ void Model3DSample::Init() {
             "    vec3 finalColor = (ambient + diffuse + specular) * vec3(objectColor);\n"
             "    outColor = vec4(finalColor, 1.0);\n"
             "}";
-    //TODO 先把 model 文件夹拷贝到 /sdcard 路径下，然后可以选择你要加载的模型
-    //m_pModel = new Model("/sdcard/model/nanosuit/nanosuit.obj");
-    m_pModel = new Model("/sdcard/model/poly/lajitong.obj");
-    //m_pModel = new Model("/sdcard/model/tank/Abrams_BF3.obj");
-    //m_pModel = new Model("/sdcard/model/girl/091_W_Aya_10K.obj");//2000 1500
-    //m_pModel = new Model("/sdcard/model/new/camaro.obj");
-    //m_pModel = new Model("/sdcard/model/bird/12214_Bird_v1max_l3.obj");
+    m_pModel = new Model("/sdcard/model/poly/nanosuit/nanosuit.obj");
+//    m_pModel = new Model("/sdcard/model/poly/lajitong.obj");
+//    m_pModel = new Model("/sdcard/model/poly/tank/Abrams_BF3.obj");
+//    m_pModel = new Model("/sdcard/model/poly/girl/091_W_Aya_10K.obj");//2000 1500
+//    m_pModel = new Model("/sdcard/model/poly/new/camaro.obj");
+//    m_pModel = new Model("/sdcard/model/poly/bird/12214_Bird_v1max_l3.obj");
+//    m_pModel = new Model("/sdcard/model/poly/earth/earth.obj");
 
     if (m_pModel->ContainsTextures()) {
         m_pShader = new Shader(vShaderStr, fShaderStr);
