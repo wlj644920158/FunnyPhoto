@@ -1,7 +1,6 @@
 //
 // Created by Administrator on 2020/5/6.
 //
-
 #include <LogUtil.h>
 #include <GLSampleBase.h>
 #include <Model3DSample.h>
@@ -16,27 +15,25 @@ void *eglThreadImpl(void *context) {
         return 0;
     }
     EglHelper *eglHelper = new EglHelper();
+    if (eglHelper->initEgl(eglThread->mANativeWindow, FLAG_TRY_GLES3) != 0) {
+        LOGCATE("eglHelper initEgl error");
+        return 0;
+    }
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.5f,0.5f,0.5f, 1.0f);
+    glViewport(0, 0, eglThread->surfaceWidth, eglThread->surfaceHeight);
+    eglHelper->swapBuffers();
+    eglThread->wlJavaCall->onEglInitFinish();
 
     while (true) {
         Message *message = new Message();
         eglThread->getMessage(message);
-        if (message->what == MESSAGE_TYPE_SURFACE_CREATED) {
-            //Surface创建的时候,利用mANativeWindow初始化Egl环境
-            LOGCATE("MESSAGE_TYPE_SURFACE_CREATED");
-            if (eglHelper->initEgl(eglThread->mANativeWindow, FLAG_TRY_GLES3) != 0) {
-                LOGCATE("eglHelper initEgl error");
-                return 0;
-            }
-        } else if (message->what == MESSAGE_TYPE_SURFACE_SIZE_CHANGED) {
-            //Surface创建的时候,利用mANativeWindow初始化Egl环境
-            LOGCATE("MESSAGE_TYPE_SURFACE_SIZE_CHANGED");
-            glViewport(0, 0, eglThread->surfaceWidth, eglThread->surfaceHeight);
-        } else if (message->what == MESSAGE_TYPE_PREPARE) {
+       if (message->what == MESSAGE_TYPE_PREPARE) {
             LOGCATE("MESSAGE_TYPE_PREPARE");
-            eglThread->wlJavaCall->onPrepare();
+            eglThread->wlJavaCall->onLoadStart();
             eglThread->base = new Model3DSample();
             eglThread->base->Init();
-            eglThread->wlJavaCall->onFinish();
+            eglThread->wlJavaCall->onLoadFinish();
             eglThread->base->Draw(eglThread->surfaceWidth, eglThread->surfaceHeight);
             eglHelper->swapBuffers();
         } else if (message->what == MESSAGE_TYPE_TOUCH_EVENT) {
@@ -53,8 +50,6 @@ void *eglThreadImpl(void *context) {
             //do nothing
         }
     }
-
-
     eglHelper->destroyEgl();
     delete eglHelper;
     eglHelper = NULL;
@@ -66,10 +61,6 @@ void *eglThreadImpl(void *context) {
 EglThread::EglThread() {
     pthread_mutex_init(&pthread_mutex, NULL);
     pthread_cond_init(&pthread_cond, NULL);
-
-    if (mEglThread == -1) {
-        pthread_create(&mEglThread, NULL, eglThreadImpl, this);
-    }
     LOGCATE("EglThread");
 }
 
@@ -81,23 +72,14 @@ EglThread::~EglThread() {
 }
 
 
-void EglThread::onSurfaceCreate(EGLNativeWindowType window) {
+void EglThread::onSurfaceCreate(EGLNativeWindowType window, int width, int height) {
     mANativeWindow = window;
-    Message *msg = new Message();
-    msg->what = MESSAGE_TYPE_SURFACE_CREATED;
-    pushMessage(msg);
-}
-
-void EglThread::onSurfaceChange(int width, int height) {
-    if (mEglThread != -1) {
-        surfaceWidth = width;
-        surfaceHeight = height;
-        Message *msg = new Message();
-        msg->what = MESSAGE_TYPE_SURFACE_SIZE_CHANGED;
-        pushMessage(msg);
+    surfaceWidth = width;
+    surfaceHeight = height;
+    if (mEglThread == -1) {
+        pthread_create(&mEglThread, NULL, eglThreadImpl, this);
     }
 }
-
 
 void EglThread::pushMessage(Message *msg) {
     pthread_mutex_lock(&pthread_mutex);
@@ -133,6 +115,7 @@ void EglThread::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX
 void EglThread::setJavaCall(JavaCall *wlJavaCall) {
     this->wlJavaCall = wlJavaCall;
 }
+
 
 
 

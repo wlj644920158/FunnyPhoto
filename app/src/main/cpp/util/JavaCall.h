@@ -14,8 +14,9 @@ class JavaCall {
 public:
     _JavaVM *javaVM = NULL;
     JNIEnv *jniEnv = NULL;
-    jmethodID jmid_on_prepare;
-    jmethodID jmid_on_finish;
+    jmethodID jmid_on_load_start;
+    jmethodID jmid_on_load_finish;
+    jmethodID jmid_on_egl_init_finish;
 
     jobject jobj;
 
@@ -24,10 +25,11 @@ public:
 
     ~JavaCall();
 
+    void onLoadStart();
 
-    void onPrepare();
+    void onLoadFinish();
 
-    void onFinish();
+    void onEglInitFinish();
 
     void release();
 };

@@ -13,8 +13,9 @@ JavaCall::JavaCall(_JavaVM *vm, JNIEnv *env, jobject *obj) {
     if (!jlz) {
         return;
     }
-    jmid_on_prepare = jniEnv->GetMethodID(jlz, "onPrepare", "()V");
-    jmid_on_finish = jniEnv->GetMethodID(jlz, "onFinish", "()V");
+    jmid_on_load_start = jniEnv->GetMethodID(jlz, "onLoadStart", "()V");
+    jmid_on_load_finish = jniEnv->GetMethodID(jlz, "onLoadFinish", "()V");
+    jmid_on_egl_init_finish = jniEnv->GetMethodID(jlz, "onEglInitFinish", "()V");
 }
 
 JavaCall::~JavaCall() {
@@ -31,21 +32,30 @@ void JavaCall::release() {
 }
 
 
-void JavaCall::onPrepare() {
+void JavaCall::onLoadStart() {
     JNIEnv *jniEnv;
     if (javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
         return;
     }
-    jniEnv->CallVoidMethod(jobj, jmid_on_prepare);
+    jniEnv->CallVoidMethod(jobj, jmid_on_load_start);
     javaVM->DetachCurrentThread();
 }
 
-void JavaCall::onFinish() {
+void JavaCall::onLoadFinish() {
     JNIEnv *jniEnv;
     if (javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
         return;
     }
-    jniEnv->CallVoidMethod(jobj, jmid_on_finish);
+    jniEnv->CallVoidMethod(jobj, jmid_on_load_finish);
+    javaVM->DetachCurrentThread();
+}
+
+void JavaCall::onEglInitFinish() {
+    JNIEnv *jniEnv;
+    if (javaVM->AttachCurrentThread(&jniEnv, 0) != JNI_OK) {
+        return;
+    }
+    jniEnv->CallVoidMethod(jobj, jmid_on_egl_init_finish);
     javaVM->DetachCurrentThread();
 }
 

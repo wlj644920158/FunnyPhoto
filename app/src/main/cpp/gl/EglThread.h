@@ -1,7 +1,6 @@
 //
 // Created by Administrator on 2020/5/6.
 //
-
 #ifndef FUNNYPHOTO_EGLTHREAD_H
 #define FUNNYPHOTO_EGLTHREAD_H
 
@@ -42,9 +41,8 @@ public:
     void setJavaCall(JavaCall *wlJavaCall);
 
     //生命周期对应响应
-    void onSurfaceCreate(EGLNativeWindowType window);
+    void onSurfaceCreate(EGLNativeWindowType window,int width, int height);
 
-    void onSurfaceChange(int width, int height);
 
     void pushMessage(Message *msg);
 

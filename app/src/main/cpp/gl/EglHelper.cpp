@@ -2,7 +2,7 @@
 // Created by Administrator on 2020/5/6.
 //
 
-#include <LogUtil.h>
+#include "../util/LogUtil.h"
 #include "EglHelper.h"
 
 
@@ -22,7 +22,6 @@ int EglHelper::initEgl(EGLNativeWindowType window,int flags) {
         LOGCATE("eglGetDisplay error");
         return -1;
     }
-
     if (!eglInitialize(mEglDisplay, 0, 0)) {
         LOGCATE("eglInitialize error");
         return -1;
@@ -116,8 +115,8 @@ EGLConfig EglHelper::getConfig(int flags, int version) {
             EGL_GREEN_SIZE, 8,
             EGL_BLUE_SIZE, 8,
             EGL_ALPHA_SIZE, 8,
-            //EGL_DEPTH_SIZE, 16,
-            //EGL_STENCIL_SIZE, 8,
+            EGL_DEPTH_SIZE, 16,
+            EGL_STENCIL_SIZE, 8,
             EGL_RENDERABLE_TYPE, renderableType,
             EGL_NONE, 0,      // placeholder for recordable [@-3]
             EGL_NONE

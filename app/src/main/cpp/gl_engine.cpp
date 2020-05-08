@@ -47,19 +47,14 @@ Java_com_wlj_funnyphoto_FunnyEngine_native_1prepare(JNIEnv *env, jobject thiz, j
 }
 JNIEXPORT void JNICALL
 Java_com_wlj_funnyphoto_FunnyEngine_native_1surface_1create(JNIEnv *env, jobject thiz,
-                                                            jobject surface) {
+                                                            jobject surface, jint width,
+                                                            jint height) {
     if (rglThread) {
         ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface);
-        rglThread->onSurfaceCreate(nativeWindow);
+        rglThread->onSurfaceCreate(nativeWindow, width, height);
     }
 }
-JNIEXPORT void JNICALL
-Java_com_wlj_funnyphoto_FunnyEngine_native_1surface_1size_1change(JNIEnv *env, jobject thiz,
-                                                                  jint width, jint height) {
-    if (rglThread) {
-        rglThread->onSurfaceChange(width, height);
-    }
-}
+
 JNIEXPORT void JNICALL
 Java_com_wlj_funnyphoto_FunnyEngine_native_1release(JNIEnv *env, jobject thiz) {
     if (rglThread) {

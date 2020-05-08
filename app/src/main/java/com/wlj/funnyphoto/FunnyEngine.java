@@ -14,9 +14,11 @@ public class FunnyEngine {
     }
 
     public interface OnLoadListener {
-        void onLoad();
+        void onLoadStart();
 
-        void onFinish();
+        void onLoadFinish();
+
+        void onEglInitFinish();
     }
 
     OnLoadListener onLoadListener;
@@ -40,16 +42,10 @@ public class FunnyEngine {
     /**
      * Surface创建
      */
-    public void setSurfaceCreate(Surface surface) {
-        native_surface_create(surface);
+    public void setSurfaceCreate(Surface surface, int width, int height) {
+        native_surface_create(surface, width, height);
     }
 
-    /**
-     * Surface尺寸改变
-     */
-    public void setSurfaceSizeChange(int width, int height) {
-        native_surface_size_change(width, height);
-    }
 
     public void onTouchEvent(float rotateX, float rotateY, float scaleX, float scaleY) {
         native_touch_event(rotateX, rotateY, scaleX, scaleY);
@@ -71,18 +67,27 @@ public class FunnyEngine {
     /**
      * 底层调用
      */
-    public void onPrepare() {
+    public void onLoadStart() {
         if (onLoadListener != null) {
-            onLoadListener.onLoad();
+            onLoadListener.onLoadStart();
         }
     }
 
     /**
      * 底层调用
      */
-    public void onFinish() {
+    public void onLoadFinish() {
         if (onLoadListener != null) {
-            onLoadListener.onFinish();
+            onLoadListener.onLoadFinish();
+        }
+    }
+
+    /**
+     * 底层调用
+     */
+    public void onEglInitFinish() {
+        if (onLoadListener != null) {
+            onLoadListener.onEglInitFinish();
         }
     }
 
@@ -90,9 +95,7 @@ public class FunnyEngine {
 
     private native void native_prepare(int type, int id);
 
-    private native void native_surface_create(Surface surface);
-
-    private native void native_surface_size_change(int width, int height);
+    private native void native_surface_create(Surface surface, int width, int height);
 
     private native void native_touch_event(float rotateX, float rotateY, float scaleX, float scaleY);
 

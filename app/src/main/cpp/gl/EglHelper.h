@@ -12,6 +12,11 @@
 
 #include "EGL/egl.h"
 #include <EGL/eglext.h>
+#include <EGL/eglplatform.h>
+#include "android/native_window.h"
+#include "android/native_window_jni.h"
+
+
 class EglHelper {
 public:
     EGLDisplay mEglDisplay;

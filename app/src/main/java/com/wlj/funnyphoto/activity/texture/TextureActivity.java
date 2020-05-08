@@ -25,6 +25,7 @@ import com.wlj.funnyphoto.GlideEngine;
 import com.wlj.funnyphoto.R;
 import com.wlj.funnyphoto.activity.BaseActivity;
 import com.wlj.funnyphoto.adpter.FunctionAdapter;
+import com.wlj.funnyphoto.util.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,39 +66,39 @@ public class TextureActivity extends BaseActivity implements FunctionAdapter.OnF
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                funnyEngine.setSurfaceCreate(holder.getSurface());
+
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                funnyEngine.setSurfaceSizeChange(width, height);
-                //在surfaceChanged调用之后立马进行资源加载并且绘制,因为在之前Egl环境已经初始化好
-                new Handler().postDelayed(() -> funnyEngine.prepareScene(0, 0), 100);
+                funnyEngine.setSurfaceCreate(holder.getSurface(),width,height);
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
+                //Surface结束的时候,底层关闭线程
+                funnyEngine.release();
+                funnyEngine = null;
             }
         });
         funnyEngine = new FunnyEngine();
         funnyEngine.setOnLoadListener(new FunnyEngine.OnLoadListener() {
             @Override
-            public void onLoad() {
+            public void onLoadStart() {
                 runOnUiThread(() -> showLoading("正在加载资源..."));
             }
 
             @Override
-            public void onFinish() {
+            public void onLoadFinish() {
                 runOnUiThread(() -> dismissLoading());
             }
-        });
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        funnyEngine.release();
-        funnyEngine = null;
+            @Override
+            public void onEglInitFinish() {
+                Log.i(Constant.Log.DEFAULT_LOG_TAG,"onEglInitFinish");
+                runOnUiThread(() -> funnyEngine.prepareScene(0,0));
+            }
+        });
     }
 
     private float mPreviousY; //上次的触控位置 y 坐标

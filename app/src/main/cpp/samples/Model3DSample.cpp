@@ -37,9 +37,9 @@ void Model3DSample::Init() {
             "uniform vec3 lightPos;\n"
             "uniform vec3 lightColor;\n"
             "uniform vec3 viewPos;\n"
-            "out vec3 ambient;\n"
-            "out vec3 diffuse;\n"
-            "out vec3 specular;\n"
+            "out vec3 ambient;//环境光照\n"
+            "out vec3 diffuse;//漫反射光照\n"
+            "out vec3 specular;//镜面光照\n"
             "void main()\n"
             "{\n"
             "    v_texCoord = a_texCoord;    \n"
@@ -95,13 +95,8 @@ void Model3DSample::Init() {
             "    vec3 finalColor = (ambient + diffuse + specular) * vec3(objectColor);\n"
             "    outColor = vec4(finalColor, 1.0);\n"
             "}";
-    m_pModel = new Model("/sdcard/model/poly/nanosuit/nanosuit.obj");
-//    m_pModel = new Model("/sdcard/model/poly/lajitong.obj");
-//    m_pModel = new Model("/sdcard/model/poly/tank/Abrams_BF3.obj");
-//    m_pModel = new Model("/sdcard/model/poly/girl/091_W_Aya_10K.obj");//2000 1500
-//    m_pModel = new Model("/sdcard/model/poly/new/camaro.obj");
-//    m_pModel = new Model("/sdcard/model/poly/bird/12214_Bird_v1max_l3.obj");
-//    m_pModel = new Model("/sdcard/model/poly/earth/earth.obj");
+    m_pModel = new Model("/sdcard/model/poly/lajitong/ljt.obj");
+//    m_pModel = new Model("/sdcard/model/poly/nanosuit/nanosuit.obj");
 
     if (m_pModel->ContainsTextures()) {
         m_pShader = new Shader(vShaderStr, fShaderStr);
@@ -117,9 +112,8 @@ void Model3DSample::LoadImage(NativeImage *pImage) {
 void Model3DSample::Draw(int screenW, int screenH) {
     if (m_pModel == nullptr || m_pShader == nullptr) return;
     LOGCATE("Model3DSample::Draw()");
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClearColor(0.5f,0.5f,0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
 
     UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float) screenW / screenH);
 
@@ -161,13 +155,13 @@ void Model3DSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY
     // Projection matrix
     //glm::mat4 Projection = glm::ortho(-ratio, ratio, -1.0f, 1.0f, 0.1f, 100.0f);
     glm::mat4 Projection = glm::frustum(-ratio, ratio, -1.0f, 1.0f, 1.0f,
-                                        m_pModel->GetMaxViewDistance() * 4);
+                                        m_pModel->GetMaxViewDistance() * 6);
     //glm::mat4 Projection = glm::perspective(45.0f,ratio, 0.1f,100.f);
 
     // View matrix
     glm::mat4 View = glm::lookAt(
             glm::vec3(0, 0, m_pModel->GetMaxViewDistance() *
-                            1.8f), // Camera is at (0,0,1), in World Space
+                            3.0f), // Camera is at (0,0,1), in World Space
             glm::vec3(0, 0, 0), // and looks at the origin
             glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
